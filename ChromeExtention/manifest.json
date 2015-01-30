@@ -1,0 +1,15 @@
+{
+    "manifest_version": 2,
+    "name": "Desktop Notification",
+    "description": "This extension displays Android Notifications inside the Chrome Browser on the desktop",
+    "version": "1.0",
+    "permissions": [
+        "activeTab",
+        "https://thinking-aloud.no-ip.org/*",
+        "notifications"
+    ],
+    "background": {
+        "persistent": true,
+        "scripts": ["jquery-2.1.3.min.js", "background.js"]
+    }
+}
