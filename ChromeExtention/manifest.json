@@ -5,6 +5,7 @@
     "version": "1.0",
     "permissions": [
         "activeTab",
+        "http://thinking-aloud.no-ip.org/*",
         "https://thinking-aloud.no-ip.org/*",
         "notifications"
     ],

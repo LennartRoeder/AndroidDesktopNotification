@@ -1,4 +1,4 @@
-package learn2crack.notification;
+package eu.thinking_aloud.notification;
 
 import android.content.Context;
 import android.content.Intent;

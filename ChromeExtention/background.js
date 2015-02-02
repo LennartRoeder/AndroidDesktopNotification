@@ -1,42 +1,30 @@
-var notification;
-
-// This should work both there and elsewhere.
-function isEmptyObject(obj) {
-    for (var key in obj) {
-        if (Object.prototype.hasOwnProperty.call(obj, key)) {
-            return false;
-        }
-    }
-    return true;
-}
-
 window.setInterval(function () {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "https://thinking-aloud.no-ip.org:8080/getNotifications", true);
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+            var response = xhr.responseText;
+//            json = json.replace(/^[^(]*\(([\S\s]+)\);?$/, '$1'); // Turn JSONP in JSON
+            response = JSON.parse(response);
 
-    $.ajax({
-        url: "https://thinking-aloud.no-ip.org:8080/getNotifications",
-        type: "GET",
-        success: function (data) {
-
-            if (!isEmptyObject(data)) {
-                var optionen = {
-                    type: 'list',
-                    title: 'Email',
-                    message: 'Primary message to display',
-//                    items: [{title: 'mein Titel', message: decodeURIComponent(data)}],
-                    items: [{title: '', message: decodeURIComponent(data)}],
-                    iconUrl: 'notification.png'
-                };
-
-                chrome.notifications.create('mein Titel', optionen, function (id) {
-                });
-//                setTimeout(function () {
-//                AUTOHIDE: not implemented jet
-//                }, 3000);
-            }
+            response.forEach(function (entry) {
+                createNotification(entry);
+            });
         }
-    });
-    // ms between check for new Messages. Should be increased for release
+    };
+    xhr.send();
+// ms between check for new Messages. Should be increased for release
 }, 2000);
 
-
-
+function createNotification(data) {
+    var options = {
+        type: 'list',
+        title: 'Notification',
+        message: 'Primary message to display',
+//        items: [{title: decodeURIComponent(data.title), message: decodeURIComponent(data.message)}],
+        items: [{title: data.title, message: data.message}],
+        iconUrl: 'notification.png'
+    };
+    chrome.notifications.create('', options, function (id) {
+    });
+}

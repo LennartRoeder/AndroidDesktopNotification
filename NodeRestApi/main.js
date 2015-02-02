@@ -1,44 +1,52 @@
 var restify = require('restify');
 var fs = require('fs');
 
-var notifications = [];
-//var notifications = {};
+var notifications = []; // holds all the notification
 
-function add(req, res, next) {
-    notifications.push(req.params.notification);
-    // notifications.title = 'ein Titel';
-    // notifications.message = req.params.notification;
+// add a notification in json format
+function addNotification(req, res, next) {
+    var json = JSON.parse(req._body);
 
-    // console.log(notifications);
+    var tmp = {};
+    tmp.title = json.title;
+    tmp.message = json.message;
 
-    res.send('added: ' + req.params.notification);
-    console.log('add(): ' + req.params.notification);
+    notifications.push(tmp);
+
+    res.send('entry added()');
     next();
 }
 
-function retrieve(req, res, next) {
+// retrieve all notifications in json format
+function retrieveNotifications(req, res, next) {
+    res.contentType = 'json';
     res.send(notifications);
-    if (notifications.length > 0) {
-        console.log('retrieve(): ' + notifications);
-    }
+
     notifications = [];
     next();
 }
 
+// load ssl cert and key
 var https_options = {
     key: fs.readFileSync('ssl/thinking-aloud.key'),
     certificate: fs.readFileSync('ssl/thinking-aloud.cert')
 };
 
-var server = restify.createServer(https_options);
-// var server = restify.createServer();
+// setup REST Server and accept json
+var server = restify.createServer(https_options); // run with SSL
+//var server = restify.createServer(); // run without SSL
 
-server.get('/getNotifications', retrieve);
-server.head('/getNotifications', retrieve);
+server.use(restify.acceptParser(server.acceptable));
+server.use(restify.jsonp());
+server.use(restify.bodyParser({mapParams: false}));
 
-server.post('/setNotification/:notification', add);
-server.head('/setNotification/:notification', add);
+// defines the rest calls
+server.get('/getNotifications', retrieveNotifications);
+server.head('/getNotifications', retrieveNotifications);
+server.post('/setNotification/:notification', addNotification);
+server.head('/setNotification/:notification', addNotification);
 
+// starts the server
 server.listen(8080, function () {
     console.log('%s listening at %s', server.name, server.url);
 });
