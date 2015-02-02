@@ -17,22 +17,28 @@ public class NotificationService extends NotificationListenerService {
     }
     @Override
     public void onNotificationPosted(StatusBarNotification sbn) {
-        String pack = sbn.getPackageName();
-//        String ticker = sbn.getNotification().tickerText.toString();
-        Bundle extras = sbn.getNotification().extras;
-        String title = extras.getString("android.title");
-        String text = extras.getCharSequence("android.text").toString();
-
-        Log.i("Package",pack);
-//        Log.i("Ticker",ticker);
-        Log.i("Title",title);
-        Log.i("Text",text);
 
         Intent msgrcv = new Intent("Msg");
-        msgrcv.putExtra("package", pack);
-//        msgrcv.putExtra("ticker", ticker);
+        Bundle extras = sbn.getNotification().extras;
+
+        String title = extras.getString("android.title");
+        Log.i("Title",title);
         msgrcv.putExtra("title", title);
-        msgrcv.putExtra("text", text);
+
+        if(extras.getCharSequence("android.text") != null) {
+            String text = extras.getCharSequence("android.text").toString();
+            Log.i("Text",text);
+            msgrcv.putExtra("text", text);
+
+        } else if(extras.getCharSequenceArray("android.textLines") != null) {
+            String text = "";
+            for (CharSequence cs : extras.getCharSequenceArray("android.textLines")) {
+                text += cs +" ";
+            }
+            Log.i("Text",text);
+            msgrcv.putExtra("text", text);
+        }
+
         LocalBroadcastManager.getInstance(context).sendBroadcast(msgrcv);
     }
     @Override

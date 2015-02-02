@@ -22,23 +22,14 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.protocol.BasicHttpContext;
-import org.apache.http.protocol.HttpContext;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
-import java.net.URLEncoder;
+
 import java.util.Calendar;
 
 import eu.thinking_aloud.notification.R;
@@ -63,16 +54,17 @@ public class MainActivity extends Activity {
     private BroadcastReceiver onNotice = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String pack = intent.getStringExtra("package");
             String title = intent.getStringExtra("title");
             String text = intent.getStringExtra("text");
             TableRow tr = new TableRow(getApplicationContext());
+
             tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+
             TextView textview = new TextView(getApplicationContext());
             textview.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1.0f));
             textview.setTextSize(20);
             textview.setTextColor(Color.parseColor("#0B0719"));
-            textview.setText(Html.fromHtml(pack + "<br><b>" + title + " : </b>" + text));
+            textview.setText(Html.fromHtml(title + " : </b>" + text));
             tr.addView(textview);
             tab.addView(tr);
 
@@ -84,20 +76,6 @@ public class MainActivity extends Activity {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
-//            try {
-//                notification = URLEncoder.encode(title + ": " + text, "UTF-8")
-//                        .replaceAll("\\+", "%20")
-//                        .replaceAll("\\%21", "!")
-//                        .replaceAll("\\%27", "'")
-//                        .replaceAll("\\%28", "(")
-//                        .replaceAll("\\%29", ")")
-//                        .replaceAll("\\%7E", "~");
-//            } catch (UnsupportedEncodingException e) {
-//                e.printStackTrace();
-//            }
-
-            Log.i("myApp", "Notification: " + title + ": " + text);
 
             new LongRunningGetIO().execute();
         }
@@ -126,7 +104,6 @@ public class MainActivity extends Activity {
             InputStream inputStream = null;
             String result = "";
             try {
-
                 // 1. create HttpClient
                 HttpClient httpclient = new DefaultHttpClient();
 
@@ -137,12 +114,6 @@ public class MainActivity extends Activity {
 
                 // 4. convert JSONObject to JSON to String
                 json = jsonObject.toString();
-
-                System.out.println("json: " + json);
-
-                // ** Alternative way to convert Person object to JSON string usin Jackson Lib
-                // ObjectMapper mapper = new ObjectMapper();
-                // json = mapper.writeValueAsString(person);
 
                 // 5. set json to StringEntity
                 StringEntity se = new StringEntity(json);
@@ -169,23 +140,7 @@ public class MainActivity extends Activity {
             } catch (Exception e) {
                 Log.d("InputStream", e.getLocalizedMessage());
             }
-
-            // 11. return result
             return result;
-
-//            HttpClient httpClient = new DefaultHttpClient();
-//            HttpContext localContext = new BasicHttpContext();
-//            HttpPost httpPost = new HttpPost("https://thinking-aloud.no-ip.org:8080/setNotification/");
-//            String text = null;
-//            try {
-//                HttpResponse response = httpClient.execute(httpPost, localContext);
-//                HttpEntity entity = response.getEntity();
-//                text = getASCIIContentFromEntity(entity);
-//
-//            } catch (Exception e) {
-//                return e.getLocalizedMessage();
-//            }
-//            return text;
         }
 
         protected void onPostExecute(String results) {
@@ -209,7 +164,6 @@ public class MainActivity extends Activity {
 
             inputStream.close();
             return result;
-
         }
     }
 
