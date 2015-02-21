@@ -13,7 +13,7 @@ window.setInterval(function () {
     };
     xhr.send();
 // ms between check for new Messages. Should be increased for release
-}, 5000);
+}, 30000);
 
 function createNotification(data) {
     var options = {
